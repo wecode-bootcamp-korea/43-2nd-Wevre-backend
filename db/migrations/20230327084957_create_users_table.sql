@@ -6,7 +6,7 @@ CREATE TABLE users (
   password VARCHAR(500) NOT NULL,
   provider_id VARCHAR(300) UNIQUE NOT NULL,
   bank_account VARCHAR(300) NULL DEFAULT "none",
-  artist_registration VARCHAR(200) NULL DEFAULT "none",
+  artist_registration VARCHAR(200) UNIQUE NULL DEFAULT "none",
   bid_agreement BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP
