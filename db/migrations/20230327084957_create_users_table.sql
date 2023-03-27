@@ -5,6 +5,7 @@ CREATE TABLE users (
   name VARCHAR(200) NOT NULL,
   password VARCHAR(500) NOT NULL,
   provider_id VARCHAR(300) UNIQUE NOT NULL,
+  bank_name VARCHAR(100) NULL,
   bank_account VARCHAR(300) UNIQUE NULL,
   artist_registration VARCHAR(200) UNIQUE NULL,
   bid_agreement BOOLEAN NOT NULL DEFAULT FALSE,
