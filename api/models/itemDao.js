@@ -25,6 +25,32 @@ const getItemDetailsById = async (itemId) => {
       GROUP BY item_id
     ) imj ON imj.item_id = i.id
     WHERE i.id = ?
+  `, 
+    [itemId]
+  );
+}
+
+const getItemById = async (itemId) => {
+  return await dataSource.query(
+    `
+    SELECT
+      seller_id,
+      category_id,
+      item_name,
+      author_name,
+      production_year,
+      width,
+      length,
+      height,
+      weight,
+      admin_number,
+      description,
+      image_url,
+      starting_bid,
+      bidding_start,
+      bidding_end
+    FROM items
+    WHERE id = ?
   `,
     [itemId]
   );
@@ -32,4 +58,5 @@ const getItemDetailsById = async (itemId) => {
 
 module.exports = {
   getItemDetailsById,
+  getItemById,
 };
