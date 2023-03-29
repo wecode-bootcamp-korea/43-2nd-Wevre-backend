@@ -1,3 +1,6 @@
+const moment = require("moment");
+const { BID_STATUS_ID } = require("./enum");
+
 const validatePhoneNumber = async (phoneNumber) => {
   const phoneNumberRegex = /^([0-9]{3})[-]([0-9]{4})[-][0-9]{4}$/;
 
@@ -20,7 +23,13 @@ const validateZipcode = async (zipcode) => {
   }
 };
 
+const checkIfBidEnded = (bidStatus) => {
+
+  return bidStatus === BID_STATUS_ID.낙찰완료 || bidStatus === BID_STATUS_ID.경매종료;
+};
+
 module.exports = {
   validatePhoneNumber,
   validateZipcode,
+  checkIfBidEnded,
 };

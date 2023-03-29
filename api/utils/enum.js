@@ -7,6 +7,13 @@ const ORDER_STATUS_ID = Object.freeze({
   배송완료: 6,
 });
 
+const BID_STATUS_ID = Object.freeze({
+  입찰전: 1,
+  입찰중: 2,
+  낙찰완료: 3,
+  경매종료: 4
+});
+
 const SHIPPING_FEE = Object.freeze({
   250000: 1,
   200000: 2,
@@ -17,5 +24,6 @@ const SHIPPING_FEE = Object.freeze({
 
 module.exports = {
   ORDER_STATUS_ID,
+  BID_STATUS_ID,
   SHIPPING_FEE
 };

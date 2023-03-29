@@ -44,8 +44,18 @@ const getItemDetailsById = async (itemId) => {
   return itemDao.getItemDetailsById(itemId);
 };
 
+const getAllBidStatus = async () => {
+  return itemDao.getAllBidStatus();
+}
+
+const getBidStatusByItemId = async (itemId) => {
+  return itemDao.getBidStatusByItemId(itemId);
+}
+
 module.exports = {
   getItems,
   registerItem,
   getItemDetailsById,
+  getAllBidStatus,
+  getBidStatusByItemId
 };
