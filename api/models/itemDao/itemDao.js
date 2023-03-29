@@ -173,6 +173,24 @@ const getItemById = async (itemId) => {
     );
 };
 
+const getAllBidStatus = async () => {
+    return dataSource.query(`
+      SELECT 
+        id,
+        bid_status_id
+      FROM items
+    `);
+  }
+  
+const getBidStatusByItemId = async (itemId) => {
+    return dataSource.query(`
+      SELECT 
+        bid_status_id
+      FROM items
+      WHERE id = ?
+    `, [itemId]);
+}
+
 module.exports = {
     getItems,
     findCategoryId,
@@ -181,6 +199,8 @@ module.exports = {
     registerItem,
     getItemDetailsById,
     getItemById,
+    getAllBidStatus,
+    getBidStatusByItemId
 }
 
 
