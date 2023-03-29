@@ -1,4 +1,3 @@
-const moment = require("moment");
 const { BID_STATUS_ID } = require("./enum");
 
 const validatePhoneNumber = async (phoneNumber) => {
