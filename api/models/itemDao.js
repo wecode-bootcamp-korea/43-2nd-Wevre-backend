@@ -4,6 +4,7 @@ const getItemDetailsById = async (itemId) => {
   return dataSource.query(
     `
     SELECT
+      i.id as id,
       i.author_name AS author_name,
       i.item_name AS item_name,
       i.production_year AS production_year,
@@ -14,6 +15,8 @@ const getItemDetailsById = async (itemId) => {
       i.weight AS weight,
       i.description AS description,
       i.starting_bid AS starting_bid,
+      i.bidding_start AS bidding_start,
+      i.bidding_end AS bidding_end,
       i.image_url AS image_url
     FROM items AS i
     JOIN (

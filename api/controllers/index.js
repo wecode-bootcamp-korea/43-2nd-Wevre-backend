@@ -5,5 +5,5 @@ const wishlistController = require("./wishlistController");
 module.exports = {
   itemController,
   orderController,
-  wishlistController
+  wishlistController,
 };
