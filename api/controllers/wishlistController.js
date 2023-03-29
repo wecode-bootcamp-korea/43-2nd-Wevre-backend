@@ -17,6 +17,15 @@ const addWishlist = catchAsync(async (req, res) => {
   return res.status(201).json({ data });
 });
 
+const getWishlist = catchAsync(async (req, res) => {
+  const userId = req.user.id;
+
+  const data = await wishlistService.getWishlist(userId);
+
+  return res.status(200).json({ data });
+});
+
 module.exports = {
   addWishlist,
+  getWishlist,
 };

@@ -6,4 +6,4 @@ module.exports = {
   itemController,
   orderController,
   wishlistController
-}
+};
