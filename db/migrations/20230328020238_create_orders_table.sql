@@ -3,7 +3,7 @@ CREATE TABLE orders (
   id INT PRIMARY KEY AUTO_INCREMENT,
   buyer_id INT NOT NULL,
   seller_id INT NOT NULL,
-  shipment_id INT NOT NULL UNIQUE,
+  shipment_id INT NOT NULL,
   bid_id INT NOT NULL UNIQUE,
   order_status_id INT NOT NULL, 
   phone_number VARCHAR(100) NOT NULL,
