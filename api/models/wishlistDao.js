@@ -15,7 +15,8 @@ const addWishlist = async (userId, itemId) => {
 
 const getWishlist = async (userId) => {
   return dataSource.query(`
-    SELECT 
+    SELECT
+      i.id AS item_id,
       i.author_name AS author_name,
       i.item_name AS item_name,
       i.production_year AS production_year,
