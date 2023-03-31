@@ -18,7 +18,7 @@ const addWishlist = catchAsync(async (req, res) => {
 });
 
 const getWishlist = catchAsync(async (req, res) => {
-  const userId = req.user.id;
+  const userId = 3; //req.user.id;
 
   const data = await wishlistService.getWishlist(userId);
 
