@@ -1,20 +1,56 @@
 const dataSource = require("./dataSource");
 
+const checkIfWishlistExists = async (userId, itemId) => {
+  const [result] = await dataSource.query(
+    `
+      SELECT EXISTS (
+        SELECT id
+        FROM wishlist
+        WHERE user_id = ? AND item_id = ?
+      ) AS value
+    `,
+    [userId, itemId]
+  );
+
+  return !!parseInt(result.value);
+};
+
 const addWishlist = async (userId, itemId) => {
-  const wishlist = await dataSource.query(`
-    INSERT IGNORE
-    INTO wishlist (
-      user_id,
-      item_id
-    ) VALUES (?, ?)
-    `, [userId, itemId]
+  const wishlist = await dataSource.query(
+    `
+      INSERT IGNORE
+      INTO wishlist (
+        user_id,
+        item_id
+      ) VALUES (?, ?)
+    `,
+    [userId, itemId]
   );
 
   return wishlist.insertId;
 };
 
+const deleteWishlist = async (userId, itemId) => {
+  const deletedRows = (
+    await dataSource.query(
+      `
+      DELETE FROM wishlist
+      WHERE user_id = ? AND item_id = ?
+  `,
+      [userId, itemId]
+    )
+  ).affectedRows;
+
+  if (deletedRows !== 1) {
+    throw new Error("INVALID_INPUT");
+  }
+
+  return deletedRows;
+};
+
 const getWishlist = async (userId) => {
-  return dataSource.query(`
+  return dataSource.query(
+    `
     SELECT
       i.id AS item_id,
       i.author_name AS author_name,
@@ -39,10 +75,14 @@ const getWishlist = async (userId) => {
       GROUP BY item_id
     ) imj ON imj.item_id = i.id
     WHERE w.user_id = ?
-  `, [userId]);
+  `,
+    [userId]
+  );
 };
 
 module.exports = {
+  checkIfWishlistExists,
   addWishlist,
   getWishlist,
+  deleteWishlist,
 };
