@@ -11,7 +11,6 @@ const truncateTables = async (tableList) => {
   await dataSource.query(`SET FOREIGN_KEY_CHECKS=1`);
 };
 
-module.exports = { truncateTables };
 const createTestDataSet = async () => {
   const orderStatus = [
     [
