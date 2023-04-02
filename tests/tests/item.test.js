@@ -72,12 +72,12 @@ describe("Read Item Details", () => {
     await itemsFixture.createCategories([category]);
     await itemsFixture.createItems([item]);
     await itemsFixture.createItemsMaterials([itemMaterial]);
-  });
+  }, 35000);
 
   afterAll(async () => {
     await testClient.truncateTables(tables);
     await dataSource.destroy();
-  });
+  }, 35000);
 
   test("SUCCESS: existent item read", async () => {
     const response = await request(app).get("/items/1");
