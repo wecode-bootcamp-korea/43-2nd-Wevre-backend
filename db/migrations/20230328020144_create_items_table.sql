@@ -16,6 +16,8 @@ CREATE TABLE items (
   starting_bid DECIMAL(65, 2) NOT NULL,
   bidding_start TIMESTAMP NOT NULL,
   bidding_end TIMESTAMP NOT NULL,
+  bid_status_id INT NOT NULL DEFAULT 1,
+  is_show BOOLEAN NOT NULL DEFAULT 0,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
   CONSTRAINT items_seller_id_fkey FOREIGN KEY (seller_id) REFERENCES users (id),
