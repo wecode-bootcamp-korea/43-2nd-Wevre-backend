@@ -1,6 +1,11 @@
 const { orderDao } = require("../models");
 const { validatePhoneNumber, validateZipcode } = require("../utils/validator");
 
+const getOrders = async (userId, itemId) => {
+  const shippingFee = await orderDao.getShippingFee(itemId)
+  return await orderDao.getOrders(userId, itemId, shippingFee);
+};
+
 const addOrder = async (
   buyerId,
   bidId,
@@ -25,5 +30,6 @@ const addOrder = async (
 };
 
 module.exports = {
+  getOrders,
   addOrder,
 };
