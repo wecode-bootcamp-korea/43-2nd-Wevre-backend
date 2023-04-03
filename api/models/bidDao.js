@@ -69,7 +69,7 @@ const makeBids = async (itemId, buyerId, bidPrice) => {
   }
 };
 
-const getBidsByBuyerIdAndItemId = async (itemId, buyerId) => {
+const getBidsByBuyerIdAndItemId = async (buyerId, itemId) => {
   try {
     const [highestBid] = await dataSource.query(
       `
@@ -89,7 +89,7 @@ const getBidsByBuyerIdAndItemId = async (itemId, buyerId) => {
         LIMIT 1
     `, [buyerId, itemId]
     );
-
+    
     const bids = await dataSource.query(
       `
         SELECT
@@ -205,5 +205,5 @@ module.exports = {
   makeBids,
   getBidsByBuyerIdAndItemId,
   calculateBidChangeRate,
-  checkIfHighestBidderBidsAgain,
-};
+  checkIfHighestBidderBidsAgain
+}

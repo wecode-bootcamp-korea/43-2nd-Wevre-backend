@@ -47,6 +47,11 @@ const createWebSocketServer = async (itemId, buyerId) => {
   }
 };
 
+const getBidsByBuyerIdAndItemId = async (userId, itemId) => {
+  return bidDao.getBidsByBuyerIdAndItemId(userId, itemId);
+};
+
 module.exports = {
   createWebSocketServer,
+  getBidsByBuyerIdAndItemId,
 };
