@@ -1,6 +1,10 @@
-const { WebSocketServer, WebSocket } = require("ws");
+const { WebSocketServer, WebSocket } = require('ws');
 
-const { bidDao } = require("../models");
+const { bidDao } = require('../models');
+
+const bidItemService = async (message, itemId, buyerId) => {
+  return;
+};
 
 const createWebSocketServer = async (itemId, buyerId) => {
   try {
@@ -15,16 +19,16 @@ const createWebSocketServer = async (itemId, buyerId) => {
       Object.assign(wss, webSocketServerObj);
     }
 
-    wss.on("connection", function connection(ws) {
+    wss.on('connection', function connection(ws) {
       ws.buyer_id = buyerId;
 
-      ws.on("message", async function message(message) {
+      ws.on('message', async function message(message) {
         const buffer = Buffer.from(message);
-        const bidPriceString = buffer.toString("utf8");
+        const bidPriceString = buffer.toString('utf8');
         const bidPrice = +bidPriceString;
 
         if (isNaN(bidPrice)) {
-          ws.send("숫자만 입력하세요.");
+          ws.send('숫자만 입력하세요.');
         } else {
           await bidDao.makeBids(itemId, ws.buyer_id, bidPrice);
           await bidDao.calculateBidChangeRate(itemId);
@@ -52,4 +56,5 @@ const createWebSocketServer = async (itemId, buyerId) => {
 
 module.exports = {
   createWebSocketServer,
+  bidItemService,
 };
