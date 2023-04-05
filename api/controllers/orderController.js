@@ -9,7 +9,7 @@ const getOrders = catchAsync (async (req, res) => {
 })
 
 const addOrder = catchAsync(async (req, res) => {
-  const buyerId = req.user.id;
+  const buyerId = req.user;
   const { bidId, phoneNumber, street, address, zipcode, price } = req.body;
 
   if (!bidId || !phoneNumber || !street || !address || !zipcode || !price) {
