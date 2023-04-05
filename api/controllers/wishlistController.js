@@ -2,7 +2,7 @@ const { wishlistService } = require("../services");
 const { catchAsync } = require("../utils/error");
 
 const addWishlist = catchAsync(async (req, res) => {
-  const userId = req.user.id;
+  const userId = req.user;
   const itemId = +req.params.itemId;
 
   if (!itemId) {
@@ -18,7 +18,7 @@ const addWishlist = catchAsync(async (req, res) => {
 });
 
 const getWishlist = catchAsync(async (req, res) => {
-  const userId = req.user.id;
+  const userId = req.user;
 
   const data = await wishlistService.getWishlist(userId);
 
