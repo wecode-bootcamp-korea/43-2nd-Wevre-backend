@@ -57,8 +57,7 @@ const startServer = async () => {
       const itemId = parseInt(pathname.match(/\d+/)[0], 10);
 
       const decoded = jwt.verify(accessToken, process.env.JWT_SECRET_KEY);
-      const user = await userDao.getUserById(decoded.id);
-      const buyerId = user.id;
+      const buyerId = decoded.userId;
 
       const [item] = await itemService.getBidStatusByItemId(itemId);
 
