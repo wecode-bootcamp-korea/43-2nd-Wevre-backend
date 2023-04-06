@@ -57,8 +57,69 @@ const getSales = async (userId) => {
   `, [userId])
 };
 
+const makePayment = async (
+  userId,
+  orderId,
+  paymentNumber,
+  methodType,
+  itemName,
+  amount
+) => {
+  const payment = await dataSource.query(
+    `
+    INSERT
+    INTO payment (
+      user_id,
+      order_id,
+      payment_number,
+      method_type,
+      item_name,
+      amount
+    ) VALUES (?, ?, ?, ?, ?, ?)
+  `,
+    [userId, orderId, paymentNumber, methodType, itemName, amount]
+  );
+
+  return payment.insertId;
+};
+
+const getPaymentByPaymentNumber = async (paymentNumber) => {
+  return await dataSource.query(
+    `
+    SELECT
+      user_id,
+      order_id,
+      payment_number,
+      method_type,
+      item_name,
+      amount
+    FROM payment
+    WHERE payment_number = ? 
+  `,
+    [paymentNumber]
+  );
+};
+
+const deletePayment = async (paymentNumber) => {
+  const deleteRows = (
+    await dataSource.query(`
+      DELETE 
+      FROM payment
+      WHERE payment_number = ?
+    `, [paymentNumber])
+  ).affectedRows;
+
+  if (deleteRows !== 1) {
+    throw new Error(("INVALID_INPUT"));
+  }
+
+  return deletePayment;
+}
+
 module.exports = {
   getPurchases,
   getSales,
+  makePayment,
+  getPaymentByPaymentNumber,
+  deletePayment
 };
-

@@ -88,8 +88,35 @@ const addOrder = async (
     return order.insertId;
 };
 
+const getOrderById = async (orderId) => {
+  return dataSource.query(
+    `
+    SELECT
+      o.buyer_id AS buyer_id,
+      o.seller_id AS seller_id,
+      o.shipment_id AS shipment_id,
+      o.bid_id AS bid_id,
+      o.order_status_id AS order_status_id,
+      o.phone_number AS phone_number,
+      o.street AS street,
+      o.address AS address,
+      o.zipcode AS zipcode,
+      o.price AS price,
+      i.item_name AS item_name,
+      s.fee AS fee
+    FROM orders AS o
+    JOIN bids AS b ON o.bid_id = b.id
+    JOIN items AS i ON i.id = b.item_id
+    JOIN shipment AS s on s.id = o.shipment_id 
+    WHERE o.id = ?
+  `,
+    [orderId]
+  );
+};
+
 module.exports = {
-    getShippingFee,
-    getOrders,
-    addOrder,
+  getShippingFee,
+  getOrders,
+  addOrder,
+  getOrderById 
 };

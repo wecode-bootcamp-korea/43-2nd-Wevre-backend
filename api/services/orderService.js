@@ -29,7 +29,12 @@ const addOrder = async (
   );
 };
 
+const getOrderById = async (orderId) => {
+  return orderDao.getOrderById(orderId);
+};
+
 module.exports = {
   getOrders,
   addOrder,
+  getOrderById,
 };
