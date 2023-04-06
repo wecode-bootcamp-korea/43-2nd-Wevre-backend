@@ -59,8 +59,13 @@ const deleteWebSocketServerByItemId = async (itemId) => {
   bidDao.deleteWebSocketServerByItemId(itemId);
 }
 
+const getUserBids = async (userId) => {
+  return await bidDao.getUserBids(userId);
+}
+
 module.exports = {
   createWebSocketServer,
   getBidsByBuyerIdAndItemId,
-  deleteWebSocketServerByItemId
+  deleteWebSocketServerByItemId,
+  getUserBids
 };

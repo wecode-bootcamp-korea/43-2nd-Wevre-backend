@@ -17,6 +17,13 @@ const getBidsByBuyerIdAndItemId = catchAsync(async (req, res) => {
   return res.status(200).json({ data });
 });
 
+const getUserBids = catchAsync(async (req, res) => {
+  const userId = req.user
+  const bids = await bidService.getUserBids(userId);
+  res.status(200).json({bids})
+})
+
 module.exports = {
   getBidsByBuyerIdAndItemId,
+  getUserBids
 };
