@@ -32,11 +32,12 @@ const registerItem = async (userId, imageUrl, params) => {
 
   const categoryId = await itemDao.findCategoryId(categoryName)
   const adminNumber = await generateAdminNumber.generateAdminNumber()
-  const biddingEnd = await itemDao.calculateBiddingEnd(biddingStart, biddingTerm)
+  const biddingStartDate = String(biddingStart.substring(0,4)+"-"+biddingStart.substring(4,6)+"-"+biddingStart.substring(6,8)+" 00:00:00")
+  const biddingEnd = await itemDao.calculateBiddingEnd(biddingStartDate, biddingTerm)
 
   if (!await itemDao.isRegistered(userId)) return false
   await itemDao.registerItem(userId, imageUrl, categoryId, itemName, authorName, productionYear, width,
-    length, height, weight, materials, adminNumber, description, startingBid, biddingStart, biddingEnd)
+    length, height, weight, materials, adminNumber, description, startingBid, biddingStartDate, biddingEnd)
   return true
 }
 
