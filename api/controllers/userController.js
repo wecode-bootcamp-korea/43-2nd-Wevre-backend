@@ -18,6 +18,7 @@ const getUser = catchAsync(async (req, res) => {
 
 const registerBuyer = catchAsync(async (req, res) => {
     const userId = req.user
+    console.log(userId)
     await userService.registerBuyer(userId);
     res.status(201).json({message: "SUCCESSFULLY_REGISTERED"});
 })

@@ -252,6 +252,21 @@ const setWebSocketServerByItemId = async (itemId, server) => {
   }
 };
 
+const deleteWebSocketServerByItemId = async (itemId) => {
+  try {
+    await dataSource.query(
+      `
+        DELETE
+        FROM websocket_servers
+        WHERE item_id = ?
+      `,
+      [itemId]
+    );
+  } catch (err) {
+    console.log(`DELETE_WEBSOCKET_SERVER_ERROR: ${err}`);
+  }  
+}
+
 const makeBids = async (itemId, buyerId, bidPrice) => {
   try {
     const bid = await dataSource.query(
@@ -272,7 +287,7 @@ const makeBids = async (itemId, buyerId, bidPrice) => {
   }
 };
 
-const getBidsByBuyerIdAndItemId = async (buyerId, itemId) => {
+const getBidsByBuyerIdAndItemId = async (itemId, buyerId) => {
   try {
     const [highestBid] = await dataSource.query(
       `
@@ -409,6 +424,8 @@ module.exports = {
   makeBids,
   getBidById,
   getWebSocketServerByItemId,
+  setWebSocketServerByItemId,
+  deleteWebSocketServerByItemId,
   getBidsByBuyerIdAndItemId,
   calculateBidChangeRate,
   checkIfHighestBidderBidsAgain

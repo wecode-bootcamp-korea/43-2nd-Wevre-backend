@@ -8,7 +8,10 @@ const getItems = catchAsync(async (req, res) => {
 
 const registerItem = catchAsync(async (req, res) => {
     const userId = req.user
+    console.log(`USER_ID: ${userId}`);
     const imageUrl = req.file.location
+    console.log(`REQ_FILE: ${req.file}`);
+
     const result = await itemService.registerItem(userId, imageUrl, req.body);
     if (!result) {
         return res.status(200).json({message: "ARTIST_REGISTRATION_REQUIRED"})

@@ -4,6 +4,10 @@ const { bidDao } = require("../models");
 
 const createWebSocketServer = async (itemId, buyerId) => {
   try {
+
+    console.log(`ITEM_ID: ${itemId}`);
+    console.log(`BUYER_ID: ${buyerId}`);
+
     const data = await bidDao.getWebSocketServerByItemId(itemId);
 
     const webSocketServerObj = data[0];
@@ -34,7 +38,7 @@ const createWebSocketServer = async (itemId, buyerId) => {
           );
 
           wss.clients.forEach(async function each(client) {
-            const data = await bidDao.getBidsByBuyerIdAndItemId(itemId,  ws.buyer_id);
+            const data = await bidDao.getBidsByBuyerIdAndItemId(itemId, ws.buyer_id);
             client.send(JSON.stringify(data), { binary: false });
           });
         }
@@ -51,7 +55,12 @@ const getBidsByBuyerIdAndItemId = async (userId, itemId) => {
   return bidDao.getBidsByBuyerIdAndItemId(userId, itemId);
 };
 
+const deleteWebSocketServerByItemId = async (itemId) => {
+  bidDao.deleteWebSocketServerByItemId(itemId);
+}
+
 module.exports = {
   createWebSocketServer,
   getBidsByBuyerIdAndItemId,
+  deleteWebSocketServerByItemId
 };

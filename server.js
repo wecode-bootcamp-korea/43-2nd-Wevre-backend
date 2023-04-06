@@ -32,7 +32,7 @@ const startServer = async () => {
       const items = await itemService.getAllBidStatus();
 
       items.forEach(async (item) => {
-        const itemId = item.id;
+        const itemId = +item.id;
 
         if (webSocketServers[itemId] && checkIfBidEnded(item.bid_status_id)) {
           webSocketServers[itemId].clients.forEach((client) => {
@@ -41,6 +41,8 @@ const startServer = async () => {
 
           webSocketServers[itemId].close();
           delete webSocketServers[itemId];
+
+          await bidService.deleteWebSocketServerByItemId(itemId);
         }
       });
     } catch (err) {
@@ -56,7 +58,7 @@ const startServer = async () => {
       const accessToken = url.parse(request.url, true).query.accessToken;
       const itemId = parseInt(pathname.match(/\d+/)[0], 10);
 
-      const decoded = jwt.verify(accessToken, process.env.JWT_SECRET_KEY);
+      const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
       const buyerId = decoded.userId;
 
       const [item] = await itemService.getBidStatusByItemId(itemId);

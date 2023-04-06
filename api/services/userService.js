@@ -48,8 +48,8 @@ const login = async (code) => {
   const [userId] = await userDao.getUserBySocialId(kakaoId);
 
   if (!isExist) {
-    await userDao.createKakaoUser(kakaoId, email, nickname)
-    jwtAccessToken({userId: kakaoId})
+    const insertId = await userDao.createKakaoUser(kakaoId, email, nickname)
+    jwtAccessToken({userId: insertId})
   } else {
     jwtAccessToken({userId: userId.userId})
   }
@@ -62,6 +62,7 @@ const getUser = async (userId) => {
 };
 
 const registerBuyer = async (userId) => {
+  console.log("111")
   return await userDao.registerBuyer(userId);
 };
 

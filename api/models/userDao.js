@@ -17,10 +17,12 @@ const getUser = async (userId) => {
 }
 
 const registerBuyer = async (userId) => {
+    console.log("222")
     await dataSource.query(`
       UPDATE users
       SET bid_agreement = 1
       WHERE id = ?`, [userId])
+      console.log("3333")
 }
 
 const registerSeller = async (userId, bankName, bankAccount, artistRegistration) => {
@@ -40,8 +42,10 @@ const checkRegistered = async (kakaoId) => {
 }
 
 const createKakaoUser = async (kakaoId, email, nickname) => {
-    await dataSource.query(`INSERT INTO users(email, name, provider_id)
-                          VALUES (?, ?, ?)`, [email, nickname, kakaoId])
+    const user = await dataSource.query(`INSERT INTO users(email, name, provider_id)
+                          VALUES (?, ?, ?)`, [email, nickname, kakaoId]);
+
+    return user.insertId;
 }
 
 const getUserBySocialId = async (kakaoId) => {
