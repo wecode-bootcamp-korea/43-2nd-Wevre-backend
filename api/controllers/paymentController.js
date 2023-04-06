@@ -5,6 +5,8 @@ const {
   REDIRECT_URL
 } = require("../utils/kakao");
 
+let globalUserId;
+
 const getPurchases = catchAsync(async (req, res) => {
   const userId = req.user
   const purchases = await paymentService.getPurchases(userId);
@@ -19,6 +21,7 @@ const getSales = catchAsync(async (req, res) => {
 
 const readyKakaoPayment = catchAsync(async (req, res) => {
   const buyerId = req.user;
+  globalUserId = buyerId;
   const { bidId, phoneNumber, street, address, zipcode, price } = req.body;
 
   if (!bidId || !phoneNumber || !street || !address || !zipcode || !price) {
@@ -30,7 +33,7 @@ const readyKakaoPayment = catchAsync(async (req, res) => {
 
   rawPrice = price.replace(/[원,]/g, "");
 
-  const orderId = await orderService.addOrder(buyerId, bidId, phoneNumber, street, address, zipcode, price);
+  const orderId = await orderService.addOrder(buyerId, bidId, phoneNumber, street, address, zipcode, rawPrice);
 
   const nextRedirectPcUrl = await paymentService.readyKakaoPayment(
     orderId
@@ -40,7 +43,10 @@ const readyKakaoPayment = catchAsync(async (req, res) => {
 });
 
 const approveKakaoPayment = catchAsync(async (req, res) => {
-  const userId = req.user.id;
+  const userId = globalUserId;
+
+  console.log(`USER_ID: ${userId}`);
+
   const pgToken = req.query.pg_token;
 
   if (!pgToken) {
@@ -51,7 +57,7 @@ const approveKakaoPayment = catchAsync(async (req, res) => {
   }
 
   await paymentService.approveKakaoPayment(userId, pgToken);
-
+  
   return res.redirect(REDIRECT_URL);
 });
 

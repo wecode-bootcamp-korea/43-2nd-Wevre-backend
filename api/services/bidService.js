@@ -30,7 +30,7 @@ const createWebSocketServer = async (itemId, buyerId) => {
         if (isNaN(bidPrice)) {
           ws.send("숫자만 입력하세요.");
         } else {
-          await bidDao.makeBids(itemId,  ws.buyer_id, bidPrice);
+          await bidDao.makeBids(itemId, ws.buyer_id, bidPrice);
           await bidDao.calculateBidChangeRate(itemId);
           const result = await bidDao.checkIfHighestBidderBidsAgain(
             itemId,

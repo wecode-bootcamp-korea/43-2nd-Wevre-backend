@@ -1,5 +1,5 @@
 const dataSource = require("./dataSource");
-const itemDao = require("./itemDao");
+const itemDao = require("./itemDao/itemDao");
 const bidDao = require("./bidDao");
 
 const {ORDER_STATUS_ID, SHIPPING_FEE} = require("../utils/enum");

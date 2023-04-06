@@ -2,8 +2,11 @@ const { orderService } = require("../services");
 const { catchAsync } = require("../utils/error");
 
 const getOrders = catchAsync (async (req, res) => {
+
+  console.log("111111")
   const userId = req.user
   const {itemId} = req.params;
+  console.log("11", itemId)
   const orders = await orderService.getOrders(userId, itemId);
   res.status(200).json({orders});
 })

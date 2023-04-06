@@ -81,6 +81,8 @@ const approveKakaoPayment = async (userId, pgToken) => {
   const amount = data.amount;
   const itemName = data.item_name;
 
+  console.log(JSON.stringify(data));
+
   await paymentDao.makePayment(userId, orderIdForPayment, paymentNumber, paymentMethod, itemName, amount);
   const [payment] = await paymentDao.getPaymentByPaymentNumber(paymentNumber);
 
