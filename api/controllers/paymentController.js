@@ -1,23 +1,22 @@
 const { paymentService, orderService } = require("../services");
 const { catchAsync } = require("../utils/error");
+const { REDIRECT_URL } = require("../utils/kakao");
 
-const {
-  REDIRECT_URL
-} = require("../utils/kakao");
-
-let globalUserId;
+let globalBuyerId;
 
 const getPurchases = catchAsync(async (req, res) => {
-  const userId = req.user
-  const purchases = await paymentService.getPurchases(userId);
-  res.status(200).json({purchases});
-})
+  const buyerId = req.user;
+  const purchases = await paymentService.getPurchases(buyerId);
+
+  res.status(200).json({ purchases });
+});
 
 const getSales = catchAsync(async (req, res) => {
-  const userId = req.user
-  const sales = await paymentService.getSales(userId);
-  res.status(200).json({sales});
-})
+  const buyerId = req.user;
+  const sales = await paymentService.getSales(buyerId);
+
+  res.status(200).json({ sales });
+});
 
 const readyKakaoPayment = catchAsync(async (req, res) => {
   const buyerId = req.user;
@@ -33,19 +32,23 @@ const readyKakaoPayment = catchAsync(async (req, res) => {
 
   rawPrice = price.replace(/[원,]/g, "");
 
-  const orderId = await orderService.addOrder(buyerId, bidId, phoneNumber, street, address, zipcode, rawPrice);
-
-  const nextRedirectPcUrl = await paymentService.readyKakaoPayment(
-    orderId
+  const orderId = await orderService.addOrder(
+    buyerId,
+    bidId,
+    phoneNumber,
+    street,
+    address,
+    zipcode,
+    rawPrice
   );
+
+  const nextRedirectPcUrl = await paymentService.readyKakaoPayment(orderId);
 
   return res.status(200).json({ data: nextRedirectPcUrl });
 });
 
 const approveKakaoPayment = catchAsync(async (req, res) => {
-  const userId = globalUserId;
-
-  console.log(`USER_ID: ${userId}`);
+  const buyerId = globalBuyerId;
 
   const pgToken = req.query.pg_token;
 
@@ -56,8 +59,8 @@ const approveKakaoPayment = catchAsync(async (req, res) => {
     throw error;
   }
 
-  await paymentService.approveKakaoPayment(userId, pgToken);
-  
+  await paymentService.approveKakaoPayment(buyerId, pgToken);
+
   return res.redirect(REDIRECT_URL);
 });
 
@@ -78,7 +81,7 @@ const cancelKakaoPaymentAfter = catchAsync(async (req, res) => {
   const data = await paymentService.cancelKakaoPayment(tid);
 
   return res.status(200).json({ data });
-})
+});
 
 module.exports = {
   getPurchases,
@@ -86,5 +89,5 @@ module.exports = {
   readyKakaoPayment,
   approveKakaoPayment,
   cancelKakaoPaymentBefore,
-  cancelKakaoPaymentAfter
+  cancelKakaoPaymentAfter,
 };

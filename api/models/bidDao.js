@@ -17,25 +17,29 @@ const getBidById = async (bidId) => {
 
 const isPassedOneDayAfterBiddingEnd = async (itemId) => {
   const now = new Date();
-  const utc = now.getTime() + (now.getTimezoneOffset() * 60 * 1000);
+  const utc = now.getTime() + now.getTimezoneOffset() * 60 * 1000;
   const KR_TIME_DIFF = 9 * 60 * 60 * 1000;
-  const kr_now = new Date(utc + (KR_TIME_DIFF)*2)
+  const kr_now = new Date(utc + KR_TIME_DIFF * 2);
 
-  const [biddingEnd] =
-    await dataSource.query(`
+  const [biddingEnd] = await dataSource.query(
+    `
         SELECT bidding_end
         FROM items
         WHERE id = ?
-    `, [itemId])
+    `,
+    [itemId]
+  );
 
-  const endDate = new Date(biddingEnd["bidding_end"])
-  const oneDayAfterEndDate = new Date(endDate.getTime() + KR_TIME_DIFF + 60 * 1000)
+  const endDate = new Date(biddingEnd["bidding_end"]);
+  const oneDayAfterEndDate = new Date(
+    endDate.getTime() + KR_TIME_DIFF + 60 * 1000
+  );
 
   if (oneDayAfterEndDate < kr_now) {
-    return true
+    return true;
   }
-  return false
-}
+  return false;
+};
 
 const getPaymentId = async (userId, itemId) => {
   const amount = await dataSource.query(
@@ -45,27 +49,32 @@ const getPaymentId = async (userId, itemId) => {
                  INNER JOIN orders ON orders.id = payment.order_id
                  INNER JOIN bids ON bids.id = orders.bid_id
         WHERE payment.user_id = ?
-          AND bids.item_id = ?`, [userId, itemId])
+          AND bids.item_id = ?`,
+    [userId, itemId]
+  );
   if (amount.length !== 0) {
-    const [paymentId] = await dataSource.query(`
+    const [paymentId] = await dataSource.query(
+      `
         SELECT payment.id
         FROM payment
                  INNER JOIN orders ON payment.order_id = orders.id
                  INNER JOIN bids ON orders.bid_id = bids.id
         WHERE bids.bid_price = ?
           AND payment.user_id = ?
-          AND bids.item_id = ?`, [amount[0]["amount"], userId, itemId])
+          AND bids.item_id = ?`,
+      [amount[0]["amount"], userId, itemId]
+    );
 
-    console.log(!!(paymentId["id"]))
-    return !!(paymentId["id"])
+    console.log(!!paymentId["id"]);
+    return !!paymentId["id"];
   }
-}
+};
 
 const isPassedOneDayAfterPayment = async (userId, itemId) => {
   const now = new Date();
-  const utc = now.getTime() + (now.getTimezoneOffset() * 60 * 1000);
+  const utc = now.getTime() + now.getTimezoneOffset() * 60 * 1000;
   const KR_TIME_DIFF = 9 * 60 * 60 * 1000;
-  const kr_now = new Date(utc + (KR_TIME_DIFF))
+  const kr_now = new Date(utc + KR_TIME_DIFF);
 
   const amount = await dataSource.query(
     `
@@ -74,117 +83,143 @@ const isPassedOneDayAfterPayment = async (userId, itemId) => {
                  INNER JOIN orders ON orders.id = payment.order_id
                  INNER JOIN bids ON bids.id = orders.bid_id
         WHERE payment.user_id = ?
-          AND bids.item_id = ?`, [userId, itemId])
+          AND bids.item_id = ?`,
+    [userId, itemId]
+  );
   if (amount.length !== 0) {
-    const paymentId = await dataSource.query(`
+    const paymentId = await dataSource.query(
+      `
         SELECT payment.id
         FROM payment
                  INNER JOIN orders ON payment.order_id = orders.id
                  INNER JOIN bids ON orders.bid_id = bids.id
         WHERE bids.bid_price = ?
           AND payment.user_id = ?
-          AND bids.item_id = ?`, [amount[0]["amount"], userId, itemId])
+          AND bids.item_id = ?`,
+      [amount[0]["amount"], userId, itemId]
+    );
 
-    const paymentDate =
-      await dataSource.query(`
+    const paymentDate = await dataSource.query(
+      `
           SELECT created_at
           FROM payment
-          WHERE id = ?`, paymentId[0]["id"])
+          WHERE id = ?`,
+      paymentId[0]["id"]
+    );
 
-    const endDate = new Date(paymentDate[0]["created_at"])
-    const oneDayAfterEndDate = new Date(endDate.getTime() + KR_TIME_DIFF + 60 * 1000)
+    const endDate = new Date(paymentDate[0]["created_at"]);
+    const oneDayAfterEndDate = new Date(
+      endDate.getTime() + KR_TIME_DIFF + 60 * 1000
+    );
 
     if (oneDayAfterEndDate < kr_now) {
-      return true
+      return true;
     }
-    return false
+    return false;
   }
-}
+};
 
-const bidStatus = async(itemId) => {
-  const [bidStatus] = await dataSource.query(`SELECT bid_status_id FROM items WHERE id = ?`, [itemId])
-  return bidStatus["bid_status_id"]
-}
-
+const bidStatus = async (itemId) => {
+  const [bidStatus] = await dataSource.query(
+    `SELECT bid_status_id FROM items WHERE id = ?`,
+    [itemId]
+  );
+  return bidStatus["bid_status_id"];
+};
 
 const changeIsShow = async (itemId) => {
-
-  if ((await bidStatus(itemId) === 4) && ((await isPassedOneDayAfterBiddingEnd(itemId)) === true)) {
+  if (
+    (await bidStatus(itemId)) === 4 &&
+    (await isPassedOneDayAfterBiddingEnd(itemId)) === true
+  ) {
     await dataSource.query(
       ` UPDATE items
         SET is_show = 1
         WHERE id = ?
-      `, [itemId]
-    )
-
+      `,
+      [itemId]
+    );
   }
-}
+};
 
-const changeIsShowIfPaid = async(itemId, userId) => {
-
-  if ((await bidStatus(itemId) === 3) && ((await isPassedOneDayAfterBiddingEnd(itemId)) === true)) {
+const changeIsShowIfPaid = async (itemId, userId) => {
+  if (
+    (await bidStatus(itemId)) === 3 &&
+    (await isPassedOneDayAfterBiddingEnd(itemId)) === true
+  ) {
     await dataSource.query(
       ` UPDATE items
         SET is_show = 1
         WHERE id = ?
-      `, [itemId]
-    )
+      `,
+      [itemId]
+    );
   }
-  if((await bidStatus(itemId)===3) && (await getPaymentId(userId, itemId))){
+  if ((await bidStatus(itemId)) === 3 && (await getPaymentId(userId, itemId))) {
     await dataSource.query(
       ` UPDATE items
         SET is_show = 1
         WHERE id = ?
-      `, [itemId]
-    )
+      `,
+      [itemId]
+    );
   }
-}
+};
 
-
-const getUserBids = async (userId) => {
-  const bids = await dataSource.query(`
+const getBidsByBuyerId = async (buyerId) => {
+  const bids = await dataSource.query(
+    `
       SELECT id      AS bidId,
              item_id AS itemId
       FROM bids
       WHERE buyer_id = ?
-  `, [userId])
+  `,
+    [buyerId]
+  );
 
-  let bidTable = {}
+  let bidTable = {};
   for (let bid of bids) {
     if (!bidTable.hasOwnProperty(bid["itemId"])) {
-      bidTable[bid["itemId"]] = bid["bidId"]
+      bidTable[bid["itemId"]] = bid["bidId"];
     } else {
-      bidTable[bid["itemId"]] = bid["bidId"]
+      bidTable[bid["itemId"]] = bid["bidId"];
     }
   }
 
-  let bidIdArr = Object.values(bidTable)
+  let bidIdArr = Object.values(bidTable);
 
-  let itemIdArr = []
+  let itemIdArr = [];
   for (let bidId of bidIdArr) {
-    const [itemId] = await dataSource.query(`SELECT item_id
+    const [itemId] = await dataSource.query(
+      `SELECT item_id
                                              FROM bids
-                                             WHERE id = ?`, [bidId])
-    itemIdArr.push(itemId)
+                                             WHERE id = ?`,
+      [bidId]
+    );
+    itemIdArr.push(itemId);
   }
 
-  let newBidIdArr = []
+  let newBidIdArr = [];
   for (let itemId of itemIdArr) {
-    await changeIsShowIfPaid(itemId["item_id"], userId)
-    const [newBidId] = await dataSource.query(`
+    await changeIsShowIfPaid(itemId["item_id"], buyerId);
+    const [newBidId] = await dataSource.query(
+      `
         SELECT id
         FROM bids
         WHERE item_id = ?
-          AND is_show = 0`, itemId["item_id"])
-    newBidIdArr.push(newBidId)
+          AND is_show = 0`,
+      itemId["item_id"]
+    );
+    newBidIdArr.push(newBidId);
   }
 
-  const existingBidIdArr = newBidIdArr.filter((id) => id !== undefined)
+  const existingBidIdArr = newBidIdArr.filter((id) => id !== undefined);
 
-  let userBids = []
+  let userBids = [];
   for (let bidId of existingBidIdArr) {
-
-    userBids.push(await dataSource.query(`
+    userBids.push(
+      await dataSource.query(
+        `
         SELECT bids.id                                                   AS bidId,
                bids.item_id                                              AS itemId,
                items.item_name                                           AS itemName,
@@ -203,20 +238,23 @@ const getUserBids = async (userId) => {
                  INNER JOIN items ON items.id = bids.item_id
                  INNER JOIN bid_status ON bid_status.id = items.bid_status_id
         WHERE bids.id = ?
-    `, [userId, bidId["id"], bidId["id"]]))
+    `,
+        [buyerId, bidId["id"], bidId["id"]]
+      )
+    );
   }
 
   userBids.sort((a, b) => {
     if (a[0]["bidId"] < b[0]["bidId"]) return 1;
     if (a[0]["bidId"] > b[0]["bidId"]) return -1;
     return 0;
-  })
+  });
 
   const result = userBids.map(([bid]) => {
-    return {...bid}
-  })
+    return { ...bid };
+  });
   return result;
-}
+};
 
 const getWebSocketServerByItemId = async (itemId) => {
   try {
@@ -264,8 +302,8 @@ const deleteWebSocketServerByItemId = async (itemId) => {
     );
   } catch (err) {
     console.log(`DELETE_WEBSOCKET_SERVER_ERROR: ${err}`);
-  }  
-}
+  }
+};
 
 const makeBids = async (itemId, buyerId, bidPrice) => {
   try {
@@ -277,17 +315,17 @@ const makeBids = async (itemId, buyerId, bidPrice) => {
       buyer_id,
       bid_price
     ) VALUES (?, ?, ?)
-  `, 
-    [itemId, buyerId, bidPrice]
-  );
-  
+  `,
+      [itemId, buyerId, bidPrice]
+    );
+
     return bid.insertId;
   } catch (err) {
     console.log(`MAKE_BIDS_ERROR: ${err}`);
   }
 };
 
-const getBidsByBuyerIdAndItemId = async (itemId, buyerId) => {
+const getBidsByBuyerIdAndItemId = async (buyerId, itemId) => {
   try {
     const [highestBid] = await dataSource.query(
       `
@@ -305,9 +343,10 @@ const getBidsByBuyerIdAndItemId = async (itemId, buyerId) => {
         WHERE buyer_id = ? AND item_id = ?
         ORDER BY created_at DESC
         LIMIT 1
-    `, [buyerId, itemId]
+    `,
+      [buyerId, itemId]
     );
-    
+
     const bids = await dataSource.query(
       `
         SELECT
@@ -321,7 +360,7 @@ const getBidsByBuyerIdAndItemId = async (itemId, buyerId) => {
 
     return [highestBid, lastBid, bids];
   } catch (err) {
-    console.log(`GET_BIDS_ERROR: ${err}`);
+    console.log(`GET_BIDS_BY_BUYER_ID_AND_ITEM_ID_ERROR: ${err}`);
   }
 };
 
@@ -420,7 +459,7 @@ module.exports = {
   isPassedOneDayAfterBiddingEnd,
   changeIsShow,
   changeIsShowIfPaid,
-  getUserBids,
+  getBidsByBuyerId,
   makeBids,
   getBidById,
   getWebSocketServerByItemId,
@@ -428,5 +467,5 @@ module.exports = {
   deleteWebSocketServerByItemId,
   getBidsByBuyerIdAndItemId,
   calculateBidChangeRate,
-  checkIfHighestBidderBidsAgain
-}
+  checkIfHighestBidderBidsAgain,
+};
