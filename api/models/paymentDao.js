@@ -1,6 +1,6 @@
 const dataSource = require("./dataSource");
 
-const getPurchases = async (userId) => {
+const getPurchases = async (buyerId) => {
   return await dataSource.query(
     `SELECT orders.id                                                       AS orderId,
             orders.buyer_id                                                 AS buyerId,
@@ -27,12 +27,13 @@ const getPurchases = async (userId) => {
               INNER JOIN items ON items.seller_id = orders.seller_id
      WHERE orders.buyer_id = ?
     `,
-    [userId]
+    [buyerId]
   );
 };
 
-const getSales = async (userId) => {
-  return await dataSource.query(`
+const getSales = async (buyerId) => {
+  return await dataSource.query(
+    `
       SELECT orders.id                                                 AS orderId,
              orders.seller_id                                          AS sellerId,
              users.name                                                AS sellerName,
@@ -54,11 +55,13 @@ const getSales = async (userId) => {
                INNER JOIN items ON items.seller_id = orders.seller_id
                INNER JOIN payment ON payment.order_id = orders.id
       WHERE orders.seller_id = ?
-  `, [userId])
+  `,
+    [buyerId]
+  );
 };
 
 const makePayment = async (
-  userId,
+  buyerId,
   orderId,
   paymentNumber,
   methodType,
@@ -77,7 +80,7 @@ const makePayment = async (
       amount
     ) VALUES (?, ?, ?, ?, ?, ?)
   `,
-    [userId, orderId, paymentNumber, methodType, itemName, amount]
+    [buyerId, orderId, paymentNumber, methodType, itemName, amount]
   );
 
   return payment.insertId;
@@ -102,24 +105,27 @@ const getPaymentByPaymentNumber = async (paymentNumber) => {
 
 const deletePayment = async (paymentNumber) => {
   const deleteRows = (
-    await dataSource.query(`
+    await dataSource.query(
+      `
       DELETE 
       FROM payment
       WHERE payment_number = ?
-    `, [paymentNumber])
+    `,
+      [paymentNumber]
+    )
   ).affectedRows;
 
   if (deleteRows !== 1) {
-    throw new Error(("INVALID_INPUT"));
+    throw new Error("INVALID_INPUT");
   }
 
   return deletePayment;
-}
+};
 
 module.exports = {
   getPurchases,
   getSales,
   makePayment,
   getPaymentByPaymentNumber,
-  deletePayment
+  deletePayment,
 };

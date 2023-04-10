@@ -9,20 +9,20 @@ const {
   CANCEL_URL,
   FAIL_URL,
   QUANTITY,
-  TAX_FREE_AMOUNT
+  TAX_FREE_AMOUNT,
 } = require("../utils/kakao");
 
 let tid, orderIdForPayment;
 
-const getPurchases = async (userId) => {
-  return await paymentDao.getPurchases(userId);
+const getPurchases = async (buyerId) => {
+  return paymentDao.getPurchases(buyerId);
 };
 
-const getSales = async (userId) => {
-  return await paymentDao.getSales(userId);
+const getSales = async (buyerId) => {
+  return paymentDao.getSales(buyerId);
 };
 
-const readyKakaoPayment = async (orderId) => {  
+const readyKakaoPayment = async (orderId) => {
   const [order] = await orderDao.getOrderById(orderId);
 
   const response = await axios.post(
@@ -33,7 +33,7 @@ const readyKakaoPayment = async (orderId) => {
       partner_user_id: PARTNER_USER_ID,
       item_name: order.item_name,
       quantity: QUANTITY,
-      total_amount: ((+order.price) + (+order.fee)),
+      total_amount: +order.price + +order.fee,
       tax_free_amount: TAX_FREE_AMOUNT,
       approval_url: APPROVAL_URL,
       cancel_url: CANCEL_URL,
@@ -51,12 +51,12 @@ const readyKakaoPayment = async (orderId) => {
   tid = data.tid;
   orderIdForPayment = orderId;
   itemName = order.item_name;
-  amount = ((+order.price) + (+order.fee));
-  
+  amount = +order.price + +order.fee;
+
   return data.next_redirect_pc_url;
 };
 
-const approveKakaoPayment = async (userId, pgToken) => {
+const approveKakaoPayment = async (buyerId, pgToken) => {
   const response = await axios.post(
     "https://kapi.kakao.com/v1/payment/approve",
     {
@@ -75,15 +75,20 @@ const approveKakaoPayment = async (userId, pgToken) => {
   );
 
   const data = response.data;
-  
+
   const paymentNumber = data.tid;
   const paymentMethod = data.payment_method_type;
   const amount = data.amount;
   const itemName = data.item_name;
 
-  console.log(JSON.stringify(data));
-
-  await paymentDao.makePayment(userId, orderIdForPayment, paymentNumber, paymentMethod, itemName, amount);
+  await paymentDao.makePayment(
+    buyerId,
+    orderIdForPayment,
+    paymentNumber,
+    paymentMethod,
+    itemName,
+    amount
+  );
   const [payment] = await paymentDao.getPaymentByPaymentNumber(paymentNumber);
 
   return payment;
@@ -131,18 +136,18 @@ const cancelKakaoPayment = async (tid) => {
     itemName: itemName,
     quantity: quantity,
     canceledAt: canceledAt,
-    approvedAt: approvedAt
+    approvedAt: approvedAt,
   };
 
   await paymentDao.deletePayment(tid);
 
   return result;
-}
+};
 
 module.exports = {
   getPurchases,
   getSales,
   readyKakaoPayment,
   approveKakaoPayment,
-  cancelKakaoPayment
+  cancelKakaoPayment,
 };

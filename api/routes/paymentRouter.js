@@ -8,7 +8,15 @@ router.get("/purchases", loginRequired, paymentController.getPurchases);
 router.get("/sales", loginRequired, paymentController.getSales);
 router.post("/kakao/ready", loginRequired, paymentController.readyKakaoPayment);
 router.get("/kakao/approval", paymentController.approveKakaoPayment);
-router.get("/kakao/cancelation", loginRequired, paymentController.cancelKakaoPaymentBefore);
-router.post("/kakao/cancelation", loginRequired, paymentController.cancelKakaoPaymentAfter);
+router.get(
+  "/kakao/cancelation",
+  loginRequired,
+  paymentController.cancelKakaoPaymentBefore
+);
+router.post(
+  "/kakao/cancelation",
+  loginRequired,
+  paymentController.cancelKakaoPaymentAfter
+);
 
 module.exports = router;

@@ -2,21 +2,27 @@ const dataSource = require("./dataSource");
 const itemDao = require("./itemDao/itemDao");
 const bidDao = require("./bidDao");
 
-const {ORDER_STATUS_ID, SHIPPING_FEE} = require("../utils/enum");
-const {calculateShippingFee} = require("../utils/shippingFeeCalculator");
+const { ORDER_STATUS_ID, SHIPPING_FEE } = require("../utils/enum");
+const { calculateShippingFee } = require("../utils/shippingFeeCalculator");
 
 const getShippingFee = async (itemId) => {
-    const [itemInfo] = await dataSource.query(`
+  const [itemInfo] = await dataSource.query(
+    `
       SELECT width, length, height, weight
       FROM items
       WHERE id = ?
-  `, [itemId])
-    const volume = itemInfo["width"] * itemInfo["length"] * itemInfo["height"]
-    return calculateShippingFee(volume, itemInfo["weight"])
-}
+  `,
+    [itemId]
+  );
 
-const getOrders = async (userId, itemId, shippingFee) => {
-    return await dataSource.query(`
+  const volume = itemInfo["width"] * itemInfo["length"] * itemInfo["height"];
+
+  return calculateShippingFee(volume, itemInfo["weight"]);
+};
+
+const getOrders = async (buyerId, itemId, shippingFee) => {
+  return await dataSource.query(
+    `
       SELECT bids.id                                                          AS bidId,
              users.name                                                       AS userName,
              users.email                                                      AS userEmail,
@@ -32,32 +38,31 @@ const getOrders = async (userId, itemId, shippingFee) => {
                INNER JOIN users ON bids.buyer_id = users.id
       WHERE buyer_id = ?
         AND item_id = ?
-  `, [shippingFee, shippingFee, userId, itemId])
+  `,
+    [shippingFee, shippingFee, buyerId, itemId]
+  );
 };
 
 const addOrder = async (
-    buyerId,
-    bidId,
-    phoneNumber,
-    street,
-    address,
-    zipcode,
-    price
+  buyerId,
+  bidId,
+  phoneNumber,
+  street,
+  address,
+  zipcode,
+  price
 ) => {
-    const [bid] = await bidDao.getBidById(bidId);
-    const [item] = await itemDao.getItemById(+bid.item_id);
+  const [bid] = await bidDao.getBidById(bidId);
+  const [item] = await itemDao.getItemById(+bid.item_id);
 
-    const volume = item.width * item.length * item.height;
+  const volume = item.width * item.length * item.height;
 
-    const fee = calculateShippingFee(
-        volume,
-        item.weight
-    );
+  const fee = calculateShippingFee(volume, item.weight);
 
-    const shipment_id = SHIPPING_FEE[fee];
+  const shipment_id = SHIPPING_FEE[fee];
 
-    const order = await dataSource.query(
-        `
+  const order = await dataSource.query(
+    `
             INSERT
             INTO orders (buyer_id,
                          seller_id,
@@ -71,21 +76,21 @@ const addOrder = async (
                          price)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `,
-        [
-            buyerId,
-            +item.seller_id,
-            shipment_id,
-            bidId,
-            ORDER_STATUS_ID.결제완료,
-            phoneNumber,
-            street,
-            address,
-            zipcode,
-            price,
-        ]
-    );
+    [
+      buyerId,
+      +item.seller_id,
+      shipment_id,
+      bidId,
+      ORDER_STATUS_ID.결제완료,
+      phoneNumber,
+      street,
+      address,
+      zipcode,
+      price,
+    ]
+  );
 
-    return order.insertId;
+  return order.insertId;
 };
 
 const getOrderById = async (orderId) => {
@@ -118,5 +123,5 @@ module.exports = {
   getShippingFee,
   getOrders,
   addOrder,
-  getOrderById 
+  getOrderById,
 };
