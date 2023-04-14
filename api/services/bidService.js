@@ -2,7 +2,7 @@ const { WebSocketServer, WebSocket } = require("ws");
 
 const { bidDao } = require("../models");
 
-const createWebSocketServer = async (itemId, buyerId) => {
+const createWebSocketServer = async (itemId) => {
   try {
     const data = await bidDao.getWebSocketServerByItemId(itemId);
 
@@ -16,8 +16,6 @@ const createWebSocketServer = async (itemId, buyerId) => {
     }
 
     wss.on("connection", function connection(ws) {
-      ws.buyer_id = buyerId;
-
       ws.on("message", async function message(message) {
         const buffer = Buffer.from(message);
         const bidPriceString = buffer.toString("utf8");

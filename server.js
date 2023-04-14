@@ -27,7 +27,7 @@ const startServer = async () => {
 
   const PORT = process.env.PORT || 8001;
 
-  const cronJob = new cron.CronJob("* * * * *", async () => {
+  const cronJob = new cron.CronJob("0 0 * * *", async () => {
     try {
       const items = await itemService.getAllBidStatus();
 
@@ -65,8 +65,7 @@ const startServer = async () => {
 
       if (!webSocketServers[itemId] && !checkIfBidEnded(item.bid_status_id)) {
         webSocketServers[itemId] = await bidService.createWebSocketServer(
-          itemId,
-          buyerId
+          itemId
         );
       }
 
@@ -74,6 +73,7 @@ const startServer = async () => {
 
       if (wss) {
         wss.handleUpgrade(request, socket, head, function done(ws) {
+          ws.buyer_id = buyerId;
           wss.emit("connection", ws);
         });
       } else {
