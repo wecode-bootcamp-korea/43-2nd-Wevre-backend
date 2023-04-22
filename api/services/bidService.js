@@ -27,14 +27,14 @@ const createWebSocketServer = async (itemId) => {
           await bidDao.makeBids(itemId, ws.buyer_id, bidPrice);
           await bidDao.calculateBidChangeRate(itemId);
           const result = await bidDao.checkIfHighestBidderBidsAgain(
-            itemId,
-            ws.buyer_id
+            ws.buyer_id,
+            itemId
           );
 
           wss.clients.forEach(async function each(client) {
             const data = await bidDao.getBidsByBuyerIdAndItemId(
-              itemId,
-              ws.buyer_id
+              ws.buyer_id,
+              itemId
             );
             client.send(JSON.stringify(data), { binary: false });
           });
