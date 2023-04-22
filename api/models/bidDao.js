@@ -429,7 +429,7 @@ const calculateBidChangeRate = async (itemId) => {
   }
 };
 
-const checkIfHighestBidderBidsAgain = async (itemId, buyerId) => {
+const checkIfHighestBidderBidsAgain = async (buyerId, itemId) => {
   try {
     const [highestBid] = await dataSource.query(
       `
